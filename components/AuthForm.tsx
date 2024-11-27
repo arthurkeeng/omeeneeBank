@@ -12,6 +12,7 @@ import { authFormSchema } from "@/lib/utils"
 import { Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { signIn, signUp } from "@/actions/user.actions"
+import PlaidLink from "./PlaidLink"
 
 const AuthForm = ({type} : {type : string}) => {
     const [loading , setLoading ] = useState(false)
@@ -30,7 +31,20 @@ const AuthForm = ({type} : {type : string}) => {
             // sign up with appwrite
             // create plaid token
             if(type === "sign-up"){
-                const newUser = await signUp(values)
+              const userData = {
+                firstName : values.firstName!,
+                lastName : values.lastName!,
+                address1 : values.address1!,
+                city : values.city!,
+                state : values.state!, 
+                dateOfBirth : values.dateOfBirth!,
+                ssn : values.ssn!, 
+                postalCode : values.postalCode!,
+                email : values.email!,
+                password : values.password!
+
+              }
+                const newUser = await signUp(userData)
                 setUser(newUser)
                 
             }
@@ -80,8 +94,13 @@ const AuthForm = ({type} : {type : string}) => {
         </div>
         </header>
         {user ? (
-            <div className="flex flex-col gap-4"> Plaid link</div>
-        ) : <>
+            <div className="flex flex-col gap-4"> <PlaidLink
+            user= {user} 
+            variant = "primary"
+            />
+            </div>
+        ) :  
+        <>
         <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
       {type === 'sign-in' ?(<>
@@ -94,16 +113,19 @@ const AuthForm = ({type} : {type : string}) => {
     <AFormField name = "firstName" label="First Name" placeholder="First Name" control={form.control}/>
     <AFormField name = "lastName" label="Last Name" placeholder="Last Name" control={form.control}/>
       </div>
-    <AFormField name = "address" label="Address" placeholder="Enter Address" control={form.control}/>
+      <div className="flex gap-4">
+    <AFormField name = "postalCode" label="PostalCode" placeholder="Enter PostalCode" control={form.control}/>
+    <AFormField name = "address1" label="Address" placeholder="Enter Address" control={form.control}/>
+      </div>
 
       <div className="flex gap-4">
     <AFormField name = "state" label="State" placeholder="State Name" control={form.control}/>
-    <AFormField name = "nin" label="NIN" placeholder="Must be 11 characters long " control={form.control}/>
+    <AFormField name = "ssn" label="SSN" placeholder="Enter ssn" control={form.control}/>
       </div>
       <div className="flex gap-4">
 
     <AFormField name = "city" label="City" placeholder="City Name" control={form.control}/>
-    <AFormField name = "dob" label="Date Of Birth"  placeholder = "YYYY/MM/DD"control={form.control}/>
+    <AFormField name = "dateOfBirth" label="Date Of Birth"  placeholder = "YYYY/MM/DD"control={form.control}/>
       </div>
     <AFormField name = "email" label="Email" placeholder="Enter Email" control={form.control}/>
     <AFormField name = "password" label="Password" placeholder="Enter Password" control={form.control}/>
@@ -135,7 +157,8 @@ const AuthForm = ({type} : {type : string}) => {
             {type === 'sign-in' ? 'Sign Up' : "Sign In"}
         </Link>
     </footer>
-    </>}
+    </>
+    } 
     </section>
   )
 }
